@@ -69,7 +69,7 @@ def dataPrePrcs(contents):
 ### Word2Vec해주는 함수 ###
 def W2V():
     from gensim.models.word2vec import Word2Vec
-    data=pd.read_csv("/home/dapi1/TIBigdataMiddleware/train_data/single_20110224-20210224.csv")
+    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
     
     data.columns.to_list()
     data = data.drop_duplicates()
@@ -101,8 +101,8 @@ def W2V():
     print("Word2Vec 단어 임베딩 모델학습을 완료하였습니다. ")
 
     print("Word2Vec 모델저장을 시작합니다. ")
-    Word2Vec_model.save('/home/dapi1/TIBigdataMiddleware/model/word2vec.model_100')
-    Word2Vec_model = Word2Vec.load('/home/dapi1/TIBigdataMiddleware/model/word2vec.model_100')
+    Word2Vec_model.save('./model/word2vec.model_100')
+    Word2Vec_model = Word2Vec.load('./model/word2vec.model_100')
     print("Word2Vec 모델저장을 완료하였습니다. ")
     return Word2Vec
 
@@ -135,8 +135,8 @@ def cnn_train():
 
     ##### 모델링 ######
     #train data load
-    data=pd.read_csv("/home/dapi1/TIBigdataMiddleware/train_data/single_20110224-20210224.csv")
-    Word2Vec_model = Word2Vec.load('/home/dapi1/TIBigdataMiddleware/model/word2vec.model_100')
+    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
+    Word2Vec_model = Word2Vec.load('./model/word2vec.model_100')
     data.columns.to_list()
     data = data.drop_duplicates()
     del data['Unnamed: 0']
@@ -250,11 +250,11 @@ def cnn_train():
     from keras.models import model_from_json
 
     model_json = model_2.to_json()
-    with open("/home/dapi1/TIBigdataMiddleware/model/cnn_model.json", "w") as json_file : 
+    with open("./model/cnn_model.json", "w") as json_file : 
         json_file.write(model_json)
 
-    model_2.save_weights("/home/dapi1/TIBigdataMiddleware/model/cnn_model.h5")
-    filename = '/home/dapi1/TIBigdataMiddleware/model_evaluation/cnn_evaluation.log'
+    model_2.save_weights("./model/cnn_model.h5")
+    filename = './model_evaluation/cnn_evaluation.log'
     with open(filename,"w") as f:
         f.write("학습시간: ")
         f.write(str(time.time()-start))
@@ -292,11 +292,11 @@ def CNNTest(tokenized_doc):
     from keras.preprocessing.sequence import pad_sequences
 
     # model.json 파일 열기 
-    with open('/home/dapi2/TIBigdataMiddleware/model/cnn_model.json', 'r') as file :
+    with open('./model/cnn_model.json', 'r') as file :
         model_json = file.read()
         model = model_from_json(model_json)
     print("모델의 가중치 불러옵니다.")
-    model.load_weights('/home/dapi2/TIBigdataMiddleware/model/cnn_model.h5')
+    model.load_weights('./model/cnn_model.h5')
 
     model.compile(
         loss='categorical_crossentropy', 

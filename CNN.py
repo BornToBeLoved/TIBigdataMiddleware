@@ -101,7 +101,7 @@ def W2V():
                     workers=4)    # 동시에 처리할 작업 수(코어 수와 비슷하게 설정)
 
     print("time:",time.time()-start)
-    Word2Vec_model = Word2Vec.load('./model/word2vec.model_100')
+    Word2Vec_model = Word2Vec.save('./model/word2vec.model_100')
     print("Word2Vec 모델저장을 완료하였습니다. ")
     return Word2Vec
 
@@ -134,8 +134,9 @@ def cnn_train():
 
     ##### 모델링 ######
     #train data load
-    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
-    if os.path.exists('./model/word2vec.model_100'):
+    data=pd.read_csv('./train_data/single_20110224-20210224.csv')
+    
+    if os.path.isfile('./model/word2vec.model_100'):
         Word2Vec_model=Word2Vec.load('./model/word2vec/model_100')
     else:
         Word2Vec_model=W2V()

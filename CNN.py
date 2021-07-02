@@ -69,39 +69,38 @@ def dataPrePrcs(contents):
 ### Word2Vec해주는 함수 ###
 def W2V():
     from gensim.models.word2vec import Word2Vec
-    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
+    from tqdm import tqdm
+    import nltk
+    import string
+   # data=pd.read_csv("./train_data/single_20110224-20210224.csv")
     
     data.columns.to_list()
     data = data.drop_duplicates()
+    print(data.shape)
 
     start=time.time()
-    w2v_list=[]
+    result=[]
+    W2v_list=[]
     word_size=0
 
-    for i in range(len(data["키워드"])):
+    for i in tqdm(range(len(data["키워드"]))):
         st=data["키워드"][i]
-        lst=st.split()
+        lst=st.split(',')
         word_size+=len(lst)
-        w2v_list.append(lst)
-
-    print(word_size)#단어수
-    print(len(w2v_list))#문서수
+        W2v_list.append(lst)
+        
+    print(word_size)
+    print(len(W2v_list))
 
     print("Word2Vec 단어 임베딩 모델학습을 시작합니다. ")
-    start=time.time()
-
-    Word2Vec_model = Word2Vec(w2v_list,         # 리스트 형태의 데이터
+    Word2Vec_model = Word2Vec(W2v_list,         # 리스트 형태의 데이터
                     sg=1,         # 0: CBOW, 1: Skip-gram
-                    size=100,     # 벡터 크기
+                    vector_size=100,     # 벡터 크기
                     window=5,     # 고려할 앞뒤 폭(앞뒤 3단어) #window 
                     min_count=10,  # 사용할 단어의 최소 빈도(10회 이하 단어 무시)
                     workers=4)    # 동시에 처리할 작업 수(코어 수와 비슷하게 설정)
 
     print("time:",time.time()-start)
-    print("Word2Vec 단어 임베딩 모델학습을 완료하였습니다. ")
-
-    print("Word2Vec 모델저장을 시작합니다. ")
-    Word2Vec_model.save('./model/word2vec.model_100')
     Word2Vec_model = Word2Vec.load('./model/word2vec.model_100')
     print("Word2Vec 모델저장을 완료하였습니다. ")
     return Word2Vec
@@ -136,7 +135,11 @@ def cnn_train():
     ##### 모델링 ######
     #train data load
     data=pd.read_csv("./train_data/single_20110224-20210224.csv")
-    Word2Vec_model = Word2Vec.load('./model/word2vec.model_100')
+    if os.path.isfile('./model/word2vec.model_100'):
+        Word2Vec_model=Word2Vec.load('./model/word2vec/model_100')
+    else:
+        Word2Vwc_model=W2V(data)
+
     data.columns.to_list()
     data = data.drop_duplicates()
     del data['Unnamed: 0']
@@ -527,3 +530,8 @@ def MoEs(date):
     print('MongoDB의 svm collection에 분석한', len(result),'개의 주제를 저장을 완료했습니다.')
     #f.write("MongoDB의 svm collection에 분석한 주제를 저장을 완료했습니다")
     return result
+import pandas as pd
+import numpy as np
+from sklearn.exceptions import NotFittedError
+import pymongo
+from pymongo import MongoClient

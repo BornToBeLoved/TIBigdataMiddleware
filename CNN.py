@@ -72,7 +72,7 @@ def W2V():
     from tqdm import tqdm
     import nltk
     import string
-   # data=pd.read_csv("./train_data/single_20110224-20210224.csv")
+    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
     
     data.columns.to_list()
     data = data.drop_duplicates()
@@ -135,10 +135,10 @@ def cnn_train():
     ##### 모델링 ######
     #train data load
     data=pd.read_csv("./train_data/single_20110224-20210224.csv")
-    if os.path.isfile('./model/word2vec.model_100'):
+    if os.path.exists('./model/word2vec.model_100'):
         Word2Vec_model=Word2Vec.load('./model/word2vec/model_100')
     else:
-        Word2Vwc_model=W2V(data)
+        Word2Vec_model=W2V()
 
     data.columns.to_list()
     data = data.drop_duplicates()

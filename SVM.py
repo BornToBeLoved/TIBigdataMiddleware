@@ -84,7 +84,7 @@ def SVMTrain():
     tvc=TfidfVectorizer()
     ##### 모델링 ######
     #train data load
-    data=pd.read_csv("/home/dapi1/TIBigdataMiddleware/train_data/single_20110224-20210224.csv")
+    data=pd.read_csv("./train_data/single_20110224-20210224.csv")
     
     data.columns.to_list()
     data = data.drop_duplicates()

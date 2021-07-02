@@ -106,7 +106,7 @@ def svm_train():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
-    fliename='./log/svm_train.log'
+    filename='./log/svm_train.log'
     with open(filename, "a") as f:	
         f.write(date)
         f.write("\n")
@@ -120,10 +120,10 @@ def svm_train():
 #sched_train.add_job(svm_train)
 #sched_train.start()
 
-sched_train = BackgroundScheduler(daemon=True)
+#sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(svm_train,'interval',hours=24)
-sched_train.add_job(svm_train)
-sched_train.start()
+#sched_train.add_job(svm_train)
+#sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(svm)
@@ -171,15 +171,12 @@ def cnn_train():
         f.write(date)
         f.write("\n")
     print("cnn_train.log에 모델학습 실행 날짜를 기록하였습니다.")
-    result=CNN. CNN_train()
+    result=CNN. cnn_train()
     print("CNN 모델 학습을 완료하였습니다.")
     return "CNN 모델 학습 완료"   
 
 sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(cnn_train,'interval',hours=24)
-#sched_train.add_job(cnn_train)
-#sched_train.start()
-
 sched_train.add_job(cnn_train)
 sched_train.start()
 
@@ -222,7 +219,7 @@ def multi_SVM_train():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
-    fliename='./log/multi_svm_train.log'
+    filename='./log/multi_svm_train.log'
     with open(filename, "a") as f:
         f.write(date)
         f.write("\n")
@@ -231,10 +228,10 @@ def multi_SVM_train():
     print("MULTI_SVM 모델 학습을 완료하였습니다.")
     return "MULTI_SVM 모델 학습 완료"
 
-sched_train = BackgroundScheduler(daemon=True)
-sched_train.add_job(multi_SVM_train)
+#sched_train = BackgroundScheduler(daemon=True)
+#sched_train.add_job(multi_SVM_train)
 #sched_train.add_job(multi_SVM_train,'interval',hours=24)
-sched_train.start()
+#sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(multi_SVM)
@@ -242,22 +239,9 @@ sched_train.start()
 
 ################################################################
 
-#@app.route("/hello",methods=['GET'])
-"""
-def hello():
-    app = Flask(__name__)
-    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-    contents = "ndllocvcv"
-
-    from konlpy.tag import Mecab
-    tagger = Mecab()
-    t = tagger.pos("고양이는 양옹뉴턴야옹")
-    print("========================================")
-    return json.dumps(t, ensure_ascii=False)
-"""
-
-
 #@app.route("/tfidfRaw",methods=['GET'])
+
+
 """
 def tfidfRaw():
     app = Flask(__name__)
@@ -266,10 +250,10 @@ def tfidfRaw():
     Numdoc = 600
 
     contents = tfidf.getTfidfRaw(Numdoc)
-    #return json.dumps(contents, ensure_ascii=False)
     return json.dumps(contents, ensure_ascii=False)
 """
 #@app.route("/allTfidfTable",methods=['GET'])
+
 def allTfidfTable():
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -277,10 +261,10 @@ def allTfidfTable():
     tfidf_all.getAllTfidfTable()
 
     sys.exit()
-sched_train = BackgroundScheduler(daemon=True)
-sched_train.add_job(allTfidfTable)
+#sched_train = BackgroundScheduler(daemon=True)
+#sched_train.add_job(allTfidfTable)
 #sched_train.add_job(multi_SVM_train,'interval',hours=24)
-sched_train.start()
+#sched_train.start()
 #@app.route("/tfidfTable",methods=['GET'])
 """
 def tfidfTable():
@@ -292,9 +276,10 @@ def tfidfTable():
     contents = tfidf.getTfidfTable(Numdoc)
     #return json.dumps(contents, ensure_ascii=False)
     return json.dumps(contents, ensure_ascii=False)
-
+"""
 #########################################
 # 191227 ES Test update : use esFunc module
+"""
 from common import esFunc
 @app.route('/esTest', methods=['GET'])
 def esTest():
@@ -429,7 +414,8 @@ def chseAlg():
     except:
         result =  textRank()
     return result
-    
+"""
+"""
 @app.route('/keywordGraph', methods=['POST', 'GET'])
 @cross_origin(app)
 def draw():

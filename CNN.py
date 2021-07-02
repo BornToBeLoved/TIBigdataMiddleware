@@ -97,9 +97,8 @@ def W2V():
                     sg=1,         # 0: CBOW, 1: Skip-gram
                     vector_size=100,     # 벡터 크기
                     window=5,     # 고려할 앞뒤 폭(앞뒤 3단어) #window 
-                    min_count=10,  # 사용할 단어의 최소 빈도(10회 이하 단어 무시)
+                    min_count=10,  # 사용할 단어의 최소 빈도)
                     workers=4)    # 동시에 처리할 작업 수(코어 수와 비슷하게 설정)
-
     print("time:",time.time()-start)
     Word2Vec_model = Word2Vec.save('./model/word2vec.model_100')
     print("Word2Vec 모델저장을 완료하였습니다. ")
@@ -149,36 +148,36 @@ def cnn_train():
 
     #tokenizer
     from keras.preprocessing.text import Tokenizer
-
-    tokenizer = Tokenizer(num_words=1000)
-
-    # tokenizer에게 단어의 dictionary를 만들도록 fit합니다
+    
+    print("tokenizer를 생성합니다.")
+    tokenizer = Tokenizer(num_words=1000, filters=',')
+    print("tokenizer에게 1000개의 단어에 대한 dictionary를 만들도록 fit합니다")
     tokenizer.fit_on_texts(data['키워드'])
+    print("tokenizer fit에 성공하였습니다.")
 
     # 532171
 
-    # 만들어진 dictionary를 기준으로 텍스트를 숫자형으로 변환합니다
+    print("만들어진 dictionary를 기준으로 텍스트를 숫자형으로 변환합니다.")
     text_sequence = tokenizer.texts_to_sequences(data['키워드'])
-    max_len=max(len(l) for l in text_sequence)
+    max_length=max(len(l) for l in text_sequence)
     from keras.preprocessing.sequence import pad_sequences
-
-    # row의 최대 list 길이를 500으로 제한
-    max_length = 1410
-
+    
+    print(max_length,"를 최대길이로 pad_sequence를 시작합니다.")
     pad_text = pad_sequences(text_sequence, maxlen=max_length)
     y = pd.get_dummies(data['주제']).values
-    from sklearn.model_selection import train_test_split
-
+    """
+    from sklearn.model_selection import train_test_split 
     x_train, x_test, y_train, y_test = train_test_split(pad_text, 
                                                         y,
                                                         test_size=0.1
                                                         )
 
-
+    """
     vocab_size = len(tokenizer.word_index)+1 # 1을 더해주는 것은 padding으로 채운 0 때문입니다
+    print("pad_sequence를 마치고, 임베딩을 진행합니다.")
     embedding_dim = 100
     input_length = max_length # 현재 1410
-
+    
     max_features=2000
 
     num_words = min(max_features, len(tokenizer.word_index)) + 1
@@ -234,13 +233,13 @@ def cnn_train():
     output_2 = Dense(units=7, activation='softmax')(dropout_2)
 
     model_2 = Model(inputs=inputs_2, outputs=output_2)
-    model_2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    #model_2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     start= time.time()
     batch_size = 32
     early_stopping=EarlyStopping(monitor='val_loss',mode='auto', verbose=1, patience=10)
     history = model_2.fit(
-        x_train, y_train, 
+        pad_text,y,
         epochs=30, batch_size=batch_size, 
         verbose=1, validation_split=0.2,
         callbacks=[early_stopping])
@@ -258,13 +257,17 @@ def cnn_train():
         json_file.write(model_json)
 
     model_2.save_weights("./model/cnn_model.h5")
+    
+    print("time : ", time.time()-start)
+    print("cnn 모델 학습을 성공적으로 마무리하였습니다.")
+
+"""
     filename = './model_evaluation/cnn_evaluation.log'
     with open(filename,"w") as f:
         f.write("학습시간: ")
         f.write(str(time.time()-start))
         f.close()
-    print("time : ", time.time()-start)
-    with open(filename,"a") as f:
+   with open(filename,"a") as f:
         f.write("accuracy: ")
         f.write('{:.4f}'.format(model_2.evaluate(x_test, y_test)[1]))
         f.close()
@@ -288,7 +291,8 @@ def cnn_train():
         f.write(str(time.time()-start_2))
         f.close()
     return accuracy_score
-
+"""
+     
 ### 모델 예측 ###
 def CNNTest(tokenized_doc):
     from tensorflow.compat.v2.keras.models import model_from_json 

@@ -29,7 +29,7 @@ sys.path.insert(0, './common')
 
 # Sentence-tokenizer
 import re
-import tfidf
+#import tfidf
 import tfidf_all
 # Implement KR-Wordrank
 # from krwordrank.hangle import normalize
@@ -115,10 +115,10 @@ def svm_train():
     print("SVM 모델 학습을 완료하였습니다.")
     return "SVM 모델 학습 완료"
 
-sched_train = BackgroundScheduler(daemon=True)
+#sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(svm_train,'interval',hours=24)
-sched_train.add_job(svm_train)
-sched_train.start()
+#sched_train.add_job(svm_train)
+#sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(svm)
@@ -166,14 +166,14 @@ def cnn_train():
         f.write(date)
         f.write("\n")
     print("cnn_train.log에 모델학습 실행 날짜를 기록하였습니다.")
-    result=CNN.cnn_Train()
+    result=CNN. CNN_train()
     print("CNN 모델 학습을 완료하였습니다.")
     return "CNN 모델 학습 완료"   
 
-sched_train = BackgroundScheduler(daemon=True)
+#sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(cnn_train,'interval',hours=24)
-sched_train.add_job(cnn_train)
-sched_train.start()
+#sched_train.add_job(cnn_train)
+#sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(cnn)
@@ -223,17 +223,18 @@ def multi_SVM_train():
     print("MULTI_SVM 모델 학습을 완료하였습니다.")
     return "MULTI_SVM 모델 학습 완료"
 
-sched_train = BackgroundScheduler(daemon=True)
-sched_train.add_job(multi_SVM_train)
+#sched_train = BackgroundScheduler(daemon=True)
+#sched_train.add_job(multi_SVM_train)
 #sched_train.add_job(multi_SVM_train,'interval',hours=24)
-sched_train.start()
+#sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(multi_SVM)
 #sched.start(
 
 ################################################################
-@app.route("/hello",methods=['GET'])
+
+#@app.route("/hello",methods=['GET'])
 def hello():
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -247,7 +248,7 @@ def hello():
 
 
 
-@app.route("/tfidfRaw",methods=['GET'])
+#@app.route("/tfidfRaw",methods=['GET'])
 def tfidfRaw():
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -258,7 +259,7 @@ def tfidfRaw():
     #return json.dumps(contents, ensure_ascii=False)
     return json.dumps(contents, ensure_ascii=False)
 
-@app.route("/allTfidfTable",methods=['GET'])
+#@app.route("/allTfidfTable",methods=['GET'])
 def allTfidfTable():
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -266,8 +267,11 @@ def allTfidfTable():
     tfidf_all.getAllTfidfTable()
 
     sys.exit()
-
-@app.route("/tfidfTable",methods=['GET'])
+sched_train = BackgroundScheduler(daemon=True)
+sched_train.add_job(allTfidfTable)
+#sched_train.add_job(multi_SVM_train,'interval',hours=24)
+sched_train.start()
+#@app.route("/tfidfTable",methods=['GET'])
 def tfidfTable():
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True

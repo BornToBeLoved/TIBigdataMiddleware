@@ -91,7 +91,11 @@ def svm():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     filename='./log/svm.log'
+=======
+    fliename='./log/svm.log'
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
     with open(filename, "a") as f:
         f.write(date)
         f.write("\n")
@@ -106,7 +110,11 @@ def svm_train():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     filename='./log/svm_train.log'
+=======
+    fliename='./log/svm_train.log'
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
     with open(filename, "a") as f:	
         f.write(date)
         f.write("\n")
@@ -115,10 +123,17 @@ def svm_train():
     print("SVM 모델 학습을 완료하였습니다.")
     return "SVM 모델 학습 완료"
 
+<<<<<<< HEAD
 #sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(svm_train,'interval',hours=24)
 #sched_train.add_job(svm_train)
 #sched_train.start()
+=======
+sched_train = BackgroundScheduler(daemon=True)
+#sched_train.add_job(svm_train,'interval',hours=24)
+sched_train.add_job(svm_train)
+sched_train.start()
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(svm)
@@ -161,7 +176,11 @@ def cnn_train():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     filename='./log/cnn_train.log'
+=======
+    fliename='./log/cnn_train.log'
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
     with open(filename, "a") as f:
         f.write(date)
         f.write("\n")
@@ -170,10 +189,15 @@ def cnn_train():
     print("CNN 모델 학습을 완료하였습니다.")
     return "CNN 모델 학습 완료"   
 
-#sched_train = BackgroundScheduler(daemon=True)
+sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(cnn_train,'interval',hours=24)
+<<<<<<< HEAD
 #sched_train.add_job(cnn_train)
 #sched_train.start()
+=======
+sched_train.add_job(cnn_train)
+sched_train.start()
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(cnn)
@@ -214,7 +238,11 @@ def multi_SVM_train():
     now=datetime.datetime.now()
     date=now.strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     filename='./log/multi_svm_train.log'
+=======
+    fliename='./log/multi_svm_train.log'
+>>>>>>> 1d7c54ca9c8d61ae21f5c12085f74b0c15962b62
     with open(filename, "a") as f:
         f.write(date)
         f.write("\n")
@@ -223,10 +251,10 @@ def multi_SVM_train():
     print("MULTI_SVM 모델 학습을 완료하였습니다.")
     return "MULTI_SVM 모델 학습 완료"
 
-#sched_train = BackgroundScheduler(daemon=True)
-#sched_train.add_job(multi_SVM_train)
+sched_train = BackgroundScheduler(daemon=True)
+sched_train.add_job(multi_SVM_train)
 #sched_train.add_job(multi_SVM_train,'interval',hours=24)
-#sched_train.start()
+sched_train.start()
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(multi_SVM)

@@ -120,11 +120,6 @@ def svm_train():
 #sched_train.add_job(svm_train)
 #sched_train.start()
 
-#sched_train = BackgroundScheduler(daemon=True)
-#sched_train.add_job(svm_train,'interval',hours=24)
-#sched_train.add_job(svm_train)
-#sched_train.start()
-
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(svm)
 #sched.start()
@@ -175,14 +170,14 @@ def cnn_train():
     print("CNN 모델 학습을 완료하였습니다.")
     return "CNN 모델 학습 완료"   
 
-sched_train = BackgroundScheduler(daemon=True)
+#sched_train = BackgroundScheduler(daemon=True)
 #sched_train.add_job(cnn_train,'interval',hours=24)
-sched_train.add_job(cnn_train)
-sched_train.start()
+#sched_train.add_job(cnn_train)
+#sched_train.start()
 
-#sched = BackgroundScheduler(daemon=True)
-#sched.add_job(cnn)
-#sched.start()
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(cnn)
+sched.start()
 
 #################################################
 #"""
@@ -235,7 +230,7 @@ def multi_SVM_train():
 
 #sched = BackgroundScheduler(daemon=True)
 #sched.add_job(multi_SVM)
-#sched.start(
+#sched.start()
 
 ################################################################
 

@@ -16,6 +16,7 @@ import traceback
 import sys
 import esFunc
 import re
+import pickle
 
 if os.name == "nt":# 윈도우 운영체제
     from eunjeon import Mecab
@@ -24,51 +25,62 @@ else:# 현재 리눅스 서버 및 맥은 konlpy으로 미캡 모듈 import
 
 #### 토큰화해주는 함수 ####
 def dataPrePrcs(contents):
-    no_kor_num=0
-    tagger = Mecab()
-    print('mecab 형태소 분석기를 실행합니다.')
-    #f.write("Mecab을 실행합니다.")
+    import pickle                   
 
-    print('한글 외의 글자를 삭제합니다.')
-    #f.write("한글 외의 글자를 삭제합니다.")
-    hangul = re.compile('[^ ㄱ-ㅣ가-힣]+')
-    for j in range(len(contents)):
-        if re.match('[^ ㄱ-ㅣ가-힣]+',str(contents[j])):
-            no_kor_num+=1
-    contents = [hangul.sub('',str(contents[cn])) for cn in range(len(contents))]
-    print('한글 외의 글자를 가진',no_kor_num,'개의 문서 삭제를 완료했습니다.')
-    #f.write("한글 외의 글자 삭제를 완료했습니다.")
+    if os.path.exists('./train_data/tokenized_doc.json')==True:
+        with open("./train_data/tokenized_doc.json", "rb") as f:
+            tokenized_doc=pickle.load(f, encoding='euc-kr')
+    else:
+        no_kor_num=0
+        tagger = Mecab()
+        print('mecab 형태소 분석기를 실행합니다.')
+        #f.write("Mecab을 실행합니다.")
 
-    print('각 문서의 명사를 추출합니다.')
-    #f.write("각 문서의 명사를 추출합니다.")
-    #from tqdm import tqdm_notebook
-    from tqdm import tqdm
-    tokenized_doc = []
-    for cnt in tqdm(range(len(contents))):
-        #print(cnt, '번 문서의 명사를 추출합니다.')
-        nouns = tagger.nouns(contents[cnt])
-        #print(len(nouns), '토큰들을 통합합니다.')
-        tokenized_doc.append(nouns)
-    print('각 문서의 명사를', len(nouns),'개 추출을 완료했습니다.')
-    #f.write("각 문서의 명사를 추출을 완료했습니다.")
+        print('한글 외의 글자를 삭제합니다.')
+        #f.write("한글 외의 글자를 삭제합니다.")
+        hangul = re.compile('[^ ㄱ-ㅣ가-힣]+')
+        for j in range(len(contents)):
+            if re.match('[^ ㄱ-ㅣ가-힣]+',str(contents[j])):
+                no_kor_num+=1
+        contents = [hangul.sub('',str(contents[cn])) for cn in range(len(contents))]
+        print('한글 외의 글자를 가진',no_kor_num,'개의 문서 삭제를 완료했습니다.')
+        #f.write("한글 외의 글자 삭제를 완료했습니다.")
 
-    # 한글자 단어들 지우기!
-    print('한 글자 단어를 삭제합니다.')
-    #f.write("한 글자 단어를 삭제합니다.")
-    num_doc = len(tokenized_doc)
-    one_word=0
+        print('각 문서의 명사를 추출합니다.')
+        #f.write("각 문서의 명사를 추출합니다.")
+        #from tqdm import tqdm_notebook
+        from tqdm import tqdm
+        tokenized_doc = []
+        for cnt in tqdm(range(len(contents))):
+            #print(cnt, '번 문서의 명사를 추출합니다.')
+            nouns = tagger.nouns(contents[cnt])
+            #print(len(nouns), '토큰들을 통합합니다.')
+            tokenized_doc.append(nouns)
+        print('각 문서의 명사를', len(nouns),'개 추출을 완료했습니다.')
+        #f.write("각 문서의 명사를 추출을 완료했습니다.")
 
-    for i in range(num_doc):
-        tokenized_doc[i] = [word for word in tokenized_doc[i] if len(word) > 1]
+        # 한글자 단어들 지우기!
+        print('한 글자 단어를 삭제합니다.')
+        #f.write("한 글자 단어를 삭제합니다.")
+        num_doc = len(tokenized_doc)
+        one_word=0
 
-    #print('한 글자 단어 ', one_word ,'개를 삭제를 완료했습니다.')
-    print("한 글자 단어를 삭제를 완료했습니다.")
-    #f.write("한 글자 단어를 삭제를 완료했습니다.")
+        for i in range(num_doc):
+            tokenized_doc[i] = [word for word in tokenized_doc[i] if len(word) > 1]
+
+        #print('한 글자 단어 ', one_word ,'개를 삭제를 완료했습니다.')
+        print("한 글자 단어를 삭제를 완료했습니다.")
+        #f.write("한 글자 단어를 삭제를 완료했습니다"")
+        
+        #import pickle
+
+        #with open("./train_data/tokenized_doc.json", "wb") as f:
+        #    pickle.dump(tokenized_doc,
     return tokenized_doc
 
 ### Word2Vec해주는 함수 ###
 def W2V():
-    from gensim.models.word2vec import Word2Vec
+    from gensim.models import word2vec
     from tqdm import tqdm
     import nltk
     import string
@@ -93,16 +105,19 @@ def W2V():
     print(len(W2v_list))
 
     print("Word2Vec 단어 임베딩 모델학습을 시작합니다. ")
-    Word2Vec_model = Word2Vec(W2v_list,         # 리스트 형태의 데이터
+    
+    model = word2vec.Word2Vec(W2v_list,         # 리스트 형태의 데이터
                     sg=1,         # 0: CBOW, 1: Skip-gram
                     vector_size=100,     # 벡터 크기
                     window=5,     # 고려할 앞뒤 폭(앞뒤 3단어) #window 
                     min_count=10,  # 사용할 단어의 최소 빈도)
                     workers=4)    # 동시에 처리할 작업 수(코어 수와 비슷하게 설정)
+    model.save('./model/word2vec_100.model') 
+    #model.wv.save_word2vec_format('./model/word2vec_100.model',binary=False)
     print("time:",time.time()-start)
-    Word2Vec_model = Word2Vec.save('./model/word2vec.model_100')
+    #Word2Vec.save('./model/word2vec_100.model')
     print("Word2Vec 모델저장을 완료하였습니다. ")
-    return Word2Vec
+    return model
 
 ### CNN모델을 훈련해주는 함수 ###
 def cnn_train():
@@ -126,8 +141,9 @@ def cnn_train():
     from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
     from tensorflow.keras.models import load_model
     import numpy as np
-
+    import pickle 
     import matplotlib.pyplot as plt
+    
     print('train data를 불러옵니다.')
     #f.write("train data를 불러옵니다")
 
@@ -135,8 +151,9 @@ def cnn_train():
     #train data load
     data=pd.read_csv('./train_data/single_20110224-20210224.csv')
     
-    if os.path.isfile('./model/word2vec.model_100'):
-        Word2Vec_model=Word2Vec.load('./model/word2vec/model_100')
+    if os.path.isfile('./model/word2vec_100.model'):
+        #Word2Vec_model=Worid2Vec.load_word2vec_format('./model/word2vec/model_100',binary=False, encoding='utf-8')
+        Word2Vec_model=Word2Vec.load('./model/word2vec_100.model')
     else:
         Word2Vec_model=W2V()
 
@@ -165,19 +182,19 @@ def cnn_train():
     print(max_length,"를 최대길이로 pad_sequence를 시작합니다.")
     pad_text = pad_sequences(text_sequence, maxlen=max_length)
     y = pd.get_dummies(data['주제']).values
-    """
+    
     from sklearn.model_selection import train_test_split 
     x_train, x_test, y_train, y_test = train_test_split(pad_text, 
                                                         y,
                                                         test_size=0.1
                                                         )
 
-    """
+    
     vocab_size = len(tokenizer.word_index)+1 # 1을 더해주는 것은 padding으로 채운 0 때문입니다
     print("pad_sequence를 마치고, 임베딩을 진행합니다.")
     embedding_dim = 100
     input_length = max_length # 현재 1410
-    
+    print(input_length)
     max_features=2000
 
     num_words = min(max_features, len(tokenizer.word_index)) + 1
@@ -187,8 +204,8 @@ def cnn_train():
     embedding_matrix = np.zeros((num_words, embedding_dim))
 
     def get_vector(word):
-        if word in Word2Vec_model:
-            return Word2Vec_model[word]
+        if word in Word2Vec_model.wv.index_to_key:
+            return Word2Vec_model.wv[word]
         else:
             return None
 
@@ -204,7 +221,7 @@ def cnn_train():
             # doesn't exist, assign a random vector
             embedding_matrix[i] = np.random.randn(embedding_dim)
         
-    sequence_length=1410
+    sequence_length=max_length
     num_filters=100
     
     inputs_2 = Input(shape=(sequence_length,), dtype='int32')
@@ -233,22 +250,24 @@ def cnn_train():
     output_2 = Dense(units=7, activation='softmax')(dropout_2)
 
     model_2 = Model(inputs=inputs_2, outputs=output_2)
-    #model_2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model_2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     start= time.time()
     batch_size = 32
     early_stopping=EarlyStopping(monitor='val_loss',mode='auto', verbose=1, patience=10)
     history = model_2.fit(
-        pad_text,y,
+            x_train,y_train,
         epochs=30, batch_size=batch_size, 
         verbose=1, validation_split=0.2,
         callbacks=[early_stopping])
     
-    filename='model/cnn.h5'
+    filename='./model/cnn.h5'
     
     #with open(filename, 'wb') as filehandle:
     #    pickle.dump(model_2,filehandle, protocol=pickle.HIGHEST_PROTOCOL)
-    #print("\n\n#### 모델 학습 완료 ####")
+    model_2.save(filename)
+    model=load_model(filename)
+    print("\n\n#### 모델 학습 완료 ####")
     
     from keras.models import model_from_json
 
@@ -260,7 +279,7 @@ def cnn_train():
     
     print("time : ", time.time()-start)
     print("cnn 모델 학습을 성공적으로 마무리하였습니다.")
-
+    return "cnn 모델 학습을 성공적으로 마무리하였습니다."
 """
     filename = './model_evaluation/cnn_evaluation.log'
     with open(filename,"w") as f:
@@ -298,6 +317,7 @@ def CNNTest(tokenized_doc):
     from tensorflow.compat.v2.keras.models import model_from_json 
     from keras.models import load_model
     from keras.preprocessing.sequence import pad_sequences
+    from tqdm import tqdm
 
     # model.json 파일 열기 
     with open('./model/cnn_model.json', 'r') as file :
@@ -317,15 +337,23 @@ def CNNTest(tokenized_doc):
     print("주제예측을 시작합니다.")
     #f.write("주제예측을 시작합니다.")
     result=list()
-
+    
+    #text_sequence=tokenized_doc
+    print("만들어진 dictionary를 기준으로 텍스트를 숫자형으로 변환합니다.")
+    from keras.preprocessing.text import Tokenizer
+    tokenizer = Tokenizer(num_words=1000, filters=',')
+    print("tokenizer에게 1000개의 단어에 대한 dictionary를 만들도록 fit합니다")
+    
+    text_sequence = tokenizer.texts_to_sequences(tokenized_doc)
+    print("texts_to_sequence 과정을 무사히 마쳤습니다.")
     max_len=max(len(l) for l in text_sequence)
-    max_len
-    max_length = 1410
-
+    print(max_len)
+    max_length = 1452
+    print("padding과정을 시작합니다.")
     pad_text = pad_sequences(text_sequence, maxlen=max_length)
-
+    print("padding과정을 무사히 마쳤습니다.")
     #북한데이터 tokenizer & predict
-    for i in range(len(tokenized_doc)):
+    for i in tqdm(range(len(tokenized_doc))):
         if(len(tokenized_doc[i])>0):
             result.append(list(model.predict(pad_text))[0])#predict
         else:
@@ -495,6 +523,12 @@ def Post_date(date):
     return hash_key, titles, tokenized_doc, contents, times
 
 def MoEs(date):
+    import pandas as pd
+    import numpy as np
+    from sklearn.exceptions import NotFittedError
+    import pymongo
+    from pymongo import MongoClient
+
     #Mongo
     client=MongoClient(host='localhost',port=27017)
     print('MongoDB에 연결을 성공했습니다.')
@@ -535,8 +569,4 @@ def MoEs(date):
     print('MongoDB의 svm collection에 분석한', len(result),'개의 주제를 저장을 완료했습니다.')
     #f.write("MongoDB의 svm collection에 분석한 주제를 저장을 완료했습니다")
     return result
-import pandas as pd
-import numpy as np
-from sklearn.exceptions import NotFittedError
-import pymongo
-from pymongo import MongoClient
+
